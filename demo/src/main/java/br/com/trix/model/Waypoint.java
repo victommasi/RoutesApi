@@ -35,7 +35,7 @@ public class Waypoint {
 	
 	@Override
 	public String toString(){
-		return "";
+		return this.getLat() +","+ this.getLng();
 	}
 	
 }

@@ -85,20 +85,31 @@ public class RouteController
    @RequestMapping(value = "/create", method = RequestMethod.POST)
    public ResponseEntity<List<Waypoint>> createRoute(@RequestBody List<Waypoint> waypoints){
 	   
-	  // Optional<Waypoint> firstWaypoint = waypoints.stream().findFirst();
-	  /* System.out.println(firstWaypoint);
 	   System.out.println("\n\n -----------------------------");
-	   System.out.println(waypoints.get(0).getLat() + waypoints.get(0).getLat());*/
+	   //Ponto de origem também é o destino
+	   String startPoint = waypoints.get(0).toString();
+	   String endPoint = startPoint;
 	   
-	  /* String url = "http://maps.googleapis.com/maps/api/directions/json?"
-               + "origin=" + waypoints.get(0).getLat() +
+	   //Os pontos dos traçado da rota vao ter suas lat e lng concatenadas para criar a url da Google Api.
+	   StringBuilder middlePoints = new StringBuilder();
+	   for(int i = 1; i < waypoints.size(); i++){
+		   middlePoints.append("|");
+		   middlePoints.append(waypoints.get(i).toString());
+	   }
+	   
+	   //System.out.println(middlePoints);
+	   
+	   String url = "https://maps.googleapis.com/maps/api/directions/json?"
+               + "origin=" + startPoint 
                + "&destination=" + endPoint
-               + "&waypoints=optizime:true|"
-               + " "
-               + "AIzaSyCGUhLM8pidet05dKWxJ5U9oV0v_mPq9gA";
-      */
+               + "&waypoints=optimize:true"
+               + middlePoints 
+               + "&key=AIzaSyCGUhLM8pidet05dKWxJ5U9oV0v_mPq9gA";
 	   
-	   waypoints.stream().forEach(w -> w.setName("White"));
+	   System.out.println(url);
+      
+	   
+	   waypoints.stream().forEach(w -> w.setName("Black"));
 	   return new ResponseEntity<List<Waypoint>>(waypoints, HttpStatus.OK);
    }
 }
