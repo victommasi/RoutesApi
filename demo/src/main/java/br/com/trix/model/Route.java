@@ -1,7 +1,5 @@
 package br.com.trix.model;
 import java.util.List;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
@@ -13,9 +11,9 @@ public class Route {
 	@Id
 	private String id; 
 	private String routeName;
-	private LocalDateTime routeDate;
+	private Date routeDate;
 	private String vehicleId;
-	private List<String> stops;
+	private List<String> stop;
 	private List<String> path;
 
 	public String getId() {
@@ -34,12 +32,12 @@ public class Route {
 		this.routeName = name;
 	}
     
-	public LocalDateTime getDate() {
+	public Date getDate() {
 		return routeDate;
 	}
 
-	public void setDate(LocalDateTime localDateTime) {
-		this.routeDate = localDateTime;
+	public void setDate(Date date) {
+		this.routeDate = date;
 	}
 
 	public String getVehicleId() {
@@ -58,12 +56,12 @@ public class Route {
 		this.path = path;
 	}
 
-	public List<String> getStops() {
-		return path;
+	public List<String> getStop() {
+		return stop;
 	}
 
-	public void setStops(List<String> stops) {
-		this.path = stops;
+	public void setStop(List<String> stop) {
+		this.stop = stop;
 	}
 	
 	@Override

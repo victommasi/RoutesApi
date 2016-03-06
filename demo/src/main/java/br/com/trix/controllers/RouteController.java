@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -15,6 +17,8 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;
@@ -45,6 +49,8 @@ public class RouteController
    private String startPoint;
    private String endPoint;
    private StringBuilder middlePoints;
+   private List<String> stop;
+   private List<String> path;
    //private int waypointsOrder;
 	
    @Autowired
@@ -61,43 +67,50 @@ public class RouteController
    public ResponseEntity <Route> getRoute(@RequestBody Route route){
 	   
 	   	return new ResponseEntity<Route>(route, HttpStatus.OK);
-   }
+   }*/
    
    @RequestMapping(value = "/routes)", method = RequestMethod.GET, produces = "application/json")
    @ResponseBody
    public List<Route> getAll() {
     
    		return repo.findAll();
-  }
-   */
-   
-   @RequestMapping(value = "/create", method = RequestMethod.POST)
-   public ResponseEntity<List<Waypoint>> createRoute(@RequestBody List<Waypoint> waypoints){
-	   JsonElement jElement = getWaypointOrder(waypoints);
-	   JsonArray jArray = jElement.getAsJsonArray();
-	   List<String> stop = new ArrayList<String>();
-	   List<String> path = new ArrayList<String>();
-	   
-	   Route route = new Route();
-	   route.setName(waypoints.get(0).getName());
-	   route.setDate(LocalDateTime.now());
-	   route.setVehicleId("000");
-	   for(int i = 0; i < jArray.size(); i++){
-		   stop.add(jArray.get(i).getAsJsonObject().get("start_address").getAsString());
-		   
-	   }
-	   route.setStops(stop);
-	   for(int i = 0; i < jArray.size(); i++){
-		   path.add(jArray.get(i).getAsJsonObject().get("start_location").getAsJsonObject().get("lat").getAsString());
-		   path.add(jArray.get(i).getAsJsonObject().get("start_location").getAsJsonObject().get("lng").getAsString());
-	   }
-	   route.setPath(path);
-	   
-	   return new ResponseEntity<List<Waypoint>>(waypoints, HttpStatus.OK);
    }
    
-   public Route saveRoute(Route route) {
-     return repo.save(route);
+   
+   @RequestMapping(value = "/create", method = RequestMethod.POST)
+   public Route createRoute(@RequestBody List<Waypoint> waypoints){
+	   JsonElement jElement = getWaypointOrder(waypoints);
+	   JsonArray jArray = jElement.getAsJsonArray();
+	   this.stop = new ArrayList<String>();
+	   this.path = new ArrayList<String>();
+	   
+	   Route route = new Route();
+	   route.setName("Rota");
+	   route.setDate(Calendar.getInstance().getTime());
+	   route.setVehicleId("001");
+	   //create stop with names
+	   for(int i = 0; i < jArray.size(); i++){
+		   stop.add(jArray.get(i).getAsJsonObject().get("start_address").getAsString());
+	   }
+	   stop.add(jArray.get(0).getAsJsonObject().get("start_address").getAsString());
+	   route.setStop(stop);
+	   
+	   //create path with lat/lng
+	   for(int i = 0; i < jArray.size(); i++){
+		   path.add(jArray.get(i).getAsJsonObject().get("start_location")
+				   				 .getAsJsonObject().get("lat").getAsString());
+		   path.add(jArray.get(i).getAsJsonObject().get("start_location")
+				   				 .getAsJsonObject().get("lng").getAsString());
+	   }
+	   path.add(jArray.get(0).getAsJsonObject().get("start_location")
+ 				 			 .getAsJsonObject().get("lat").getAsString());
+	   path.add(jArray.get(0).getAsJsonObject().get("start_location")
+ 				             .getAsJsonObject().get("lng").getAsString());
+	   
+	   route.setPath(path);
+	   
+	   //repo.save(route);
+	   return route;
    }
    
    public JsonElement getWaypointOrder(List<Waypoint> waypoints) {
