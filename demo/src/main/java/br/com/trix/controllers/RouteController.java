@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
@@ -51,17 +52,12 @@ public class RouteController
    private StringBuilder middlePoints;
    private List<String> stop;
    private List<String> path;
+   private HttpURLConnection connRequest;
    //private int waypointsOrder;
 	
    @Autowired
    private RouteRepository repo;
 
-   @RequestMapping("/")
-   public String index()
-   {
-      return "home/index";
-   }
-   
    /*@RequestMapping(value = "/route)", method = RequestMethod.GET, produces = "application/json")
    @ResponseBody
    public ResponseEntity <Route> getRoute(@RequestBody Route route){
@@ -69,95 +65,93 @@ public class RouteController
 	   	return new ResponseEntity<Route>(route, HttpStatus.OK);
    }*/
    
-   @RequestMapping(value = "/routes)", method = RequestMethod.GET, produces = "application/json")
-   @ResponseBody
-   public List<Route> getAll() {
-    
-   		return repo.findAll();
-   }
-   
-   
-   @RequestMapping(value = "/create", method = RequestMethod.POST)
-   public Route createRoute(@RequestBody List<Waypoint> waypoints){
-	   JsonElement jElement = getWaypointOrder(waypoints);
-	   JsonArray jArray = jElement.getAsJsonArray();
-	   this.stop = new ArrayList<String>();
-	   this.path = new ArrayList<String>();
-	   
-	   Route route = new Route();
-	   route.setName("Rota");
-	   route.setDate(Calendar.getInstance().getTime());
-	   route.setVehicleId("001");
-	   //create stop with names
-	   for(int i = 0; i < jArray.size(); i++){
-		   stop.add(jArray.get(i).getAsJsonObject().get("start_address").getAsString());
-	   }
-	   stop.add(jArray.get(0).getAsJsonObject().get("start_address").getAsString());
-	   route.setStop(stop);
-	   
-	   //create path with lat/lng
-	   for(int i = 0; i < jArray.size(); i++){
-		   path.add(jArray.get(i).getAsJsonObject().get("start_location")
-				   				 .getAsJsonObject().get("lat").getAsString());
-		   path.add(jArray.get(i).getAsJsonObject().get("start_location")
-				   				 .getAsJsonObject().get("lng").getAsString());
-	   }
-	   path.add(jArray.get(0).getAsJsonObject().get("start_location")
- 				 			 .getAsJsonObject().get("lat").getAsString());
-	   path.add(jArray.get(0).getAsJsonObject().get("start_location")
- 				             .getAsJsonObject().get("lng").getAsString());
-	   
-	   route.setPath(path);
-	   
-	   //repo.save(route);
-	   return route;
-   }
-   
-   public JsonElement getWaypointOrder(List<Waypoint> waypoints) {
-	   System.out.println("\n\n-----------------------------");
-	   //Origin point is final point as well
-	   this.startPoint = waypoints.get(0).toString();
-	   this.endPoint = startPoint;
-	   this.middlePoints = new StringBuilder();
-	  
-	   //Waipoints will have its lat and lng concatenated to create an url got from Google Api bellow.
-	   for(int i = 1; i < waypoints.size(); i++){
-		   this.middlePoints.append("|");
-		   this.middlePoints.append(waypoints.get(i).toString());
-	   }
-	   
-	   String sUrl = "https://maps.googleapis.com/maps/api/directions/json?"
-               + "origin=" + startPoint 
-               + "&destination=" + endPoint
-               + "&waypoints=optimize:true" + middlePoints 
-               + "&key=AIzaSyCGUhLM8pidet05dKWxJ5U9oV0v_mPq9gA";
-	   System.out.println(sUrl);
-	   
-	  
-    	   //Connect to Url
-    	   //Get the result of request and treat it
-    	   try {
-    		   URL url = new URL(sUrl);
-    		   HttpURLConnection connRequest = (HttpURLConnection) url.openConnection();
-    		   connRequest.connect();
-    		   
-    	   //Convert Json
-    	   JsonParser jsonParser = new JsonParser();
-    	   JsonElement jsonElement = jsonParser.parse(new InputStreamReader((InputStream) connRequest.getContent()))
-				    			   	.getAsJsonObject().getAsJsonArray("routes").get(0)
-				    			   	.getAsJsonObject().getAsJsonArray("legs");
-    	   return jsonElement;
-    	  //return castJsonToInt(jsonElement); 
+	@RequestMapping(value = "/routes)", method = RequestMethod.GET, produces = "application/json")
+	@ResponseBody
+	public List<Route> getAll() {
 
-       }  catch (MalformedURLException he){ 
-    	   he.printStackTrace();
-    	   return null;
-       } catch (IOException ie){ 
-    	   ie.printStackTrace();
-    	   return null;
-       } finally {
-    	   //connRequest.connect();
-       }
-   }
+		return repo.findAll();
+	}
+   
+	@RequestMapping(value = "/create", method = RequestMethod.POST)
+	public Route createRoute(@RequestBody List<Waypoint> waypoints) {
+		JsonElement jElement = getWaypointOrder(waypoints);
+		JsonArray jArray = jElement.getAsJsonArray();
+		stop = new ArrayList<String>();
+		path = new ArrayList<String>();
+
+		// fill stop and path with jarray content
+		fillStopList(jArray);
+		fillPathList(jArray);
+
+		Route route = new Route();
+		route.setName(waypoints.get(0).getName());
+		route.setDate(Calendar.getInstance().getTime());
+		route.setVehicleId("001");
+		route.setStop(stop);
+		route.setPath(path);
+
+		return repo.insert(route);
+	}
+
+	private void fillStopList(JsonArray jArray) {
+		for (int i = 0; i < jArray.size(); i++) {
+			stop.add(jArray.get(i).getAsJsonObject().get("start_address").getAsString());
+		}
+		stop.add(jArray.get(0).getAsJsonObject().get("start_address").getAsString());
+	}
+
+	private void fillPathList(JsonArray jArray) {
+		for (int i = 0; i < jArray.size(); i++) {
+			path.add(jArray.get(i).getAsJsonObject().get("start_location").getAsJsonObject().get("lat").getAsString());
+			path.add(jArray.get(i).getAsJsonObject().get("start_location").getAsJsonObject().get("lng").getAsString());
+		}
+		path.add(jArray.get(0).getAsJsonObject().get("start_location").getAsJsonObject().get("lat").getAsString());
+		path.add(jArray.get(0).getAsJsonObject().get("start_location").getAsJsonObject().get("lng").getAsString());
+	}
+
+	public JsonElement getWaypointOrder(List<Waypoint> waypoints) {
+		System.out.println("\n\n-----------------------------");
+		// Origin point is final point as well
+		startPoint = waypoints.get(0).toString();
+		endPoint = startPoint;
+		middlePoints = new StringBuilder();
+
+		// Waipoints will have its lat and lng concatenated to create an url got
+		// from Google Api bellow.
+		for (int i = 1; i < waypoints.size(); i++) {
+			middlePoints.append("|");
+			middlePoints.append(waypoints.get(i).toString());
+		}
+
+		String sUrl = "https://maps.googleapis.com/maps/api/directions/json?" 
+		            + "origin=" + startPoint + "&destination="
+				    + endPoint + "&waypoints=optimize:true" 
+		            + middlePoints + "&key=AIzaSyCGUhLM8pidet05dKWxJ5U9oV0v_mPq9gA";
+		System.out.println(sUrl);
+
+		// Connect to Url
+		// Get the result of request and treat it
+		try {
+			URL url = new URL(sUrl);
+			connRequest = (HttpURLConnection) url.openConnection();
+			connRequest.connect();
+
+			// Convert Json
+			JsonParser jsonParser = new JsonParser();
+			JsonElement jsonElement = jsonParser.parse(new InputStreamReader((InputStream) connRequest.getContent()))
+					                            .getAsJsonObject().getAsJsonArray("routes").get(0) 
+					                            .getAsJsonObject().getAsJsonArray("legs");
+			return jsonElement;
+
+		} catch (MalformedURLException he) {
+			he.printStackTrace();
+			return null;
+		} catch (IOException ie) {
+			ie.printStackTrace();
+			return null;
+		} finally {
+			connRequest.disconnect();
+		}
+	}
 
 }

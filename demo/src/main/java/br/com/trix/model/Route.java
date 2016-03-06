@@ -4,18 +4,29 @@ import java.util.Date;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document
+@Document (collection="Routes")
 public class Route {
 	
 	@Id
 	private String id; 
-	private String routeName;
-	private Date routeDate;
+	private String name;
+	private Date date;
 	private String vehicleId;
 	private List<String> stop;
 	private List<String> path;
-
+	
+	public Route(){}
+	
+	public Route(String name, Date date, String vehicleId, List<String> stop, List<String> path){
+		this.name = name;
+		this.date = date;
+		this.vehicleId = vehicleId;
+		this.stop = stop;
+		this.path = path;
+	}
+	
 	public String getId() {
 		return id;
 	}
@@ -25,19 +36,19 @@ public class Route {
 	}
 
 	public String getName() {
-		return routeName;
+		return name;
 	}
 
 	public void setName(String name) {
-		this.routeName = name;
+		this.name = name;
 	}
     
 	public Date getDate() {
-		return routeDate;
+		return date;
 	}
 
 	public void setDate(Date date) {
-		this.routeDate = date;
+		this.date = date;
 	}
 
 	public String getVehicleId() {
