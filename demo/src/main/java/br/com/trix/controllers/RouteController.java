@@ -1,18 +1,25 @@
 package br.com.trix.controllers;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import br.com.trix.model.Route;
 import br.com.trix.model.Waypoint;
@@ -21,10 +28,13 @@ import br.com.trix.service.RouteRepository;
 //CHAVE API: AIzaSyCGUhLM8pidet05dKWxJ5U9oV0v_mPq9gA
 
 
-@Controller
+@RestController
 @RequestMapping("/")
 public class RouteController
 {
+   private String startPoint;
+   private String endPoint;
+   private StringBuilder middlePoints;
 	
    @Autowired
    private RouteRepository repo;
@@ -85,31 +95,61 @@ public class RouteController
    @RequestMapping(value = "/create", method = RequestMethod.POST)
    public ResponseEntity<List<Waypoint>> createRoute(@RequestBody List<Waypoint> waypoints){
 	   
+	  String route = getRoute(waypoints);
+	  
+	   return new ResponseEntity<List<Waypoint>>(waypoints, HttpStatus.OK);
+   }
+   
+   public String getRoute(List<Waypoint> waypoints) {
+       
+	   String test;
 	   System.out.println("\n\n -----------------------------");
 	   //Ponto de origem também é o destino
-	   String startPoint = waypoints.get(0).toString();
-	   String endPoint = startPoint;
-	   
+	   this.startPoint = waypoints.get(0).toString();
+	   this.endPoint = startPoint;
+	   this.middlePoints = new StringBuilder();
+	  
 	   //Os pontos dos traçado da rota vao ter suas lat e lng concatenadas para criar a url da Google Api.
-	   StringBuilder middlePoints = new StringBuilder();
 	   for(int i = 1; i < waypoints.size(); i++){
-		   middlePoints.append("|");
-		   middlePoints.append(waypoints.get(i).toString());
+		   this.middlePoints.append("|");
+		   this.middlePoints.append(waypoints.get(i).toString());
 	   }
 	   
-	   //System.out.println(middlePoints);
-	   
-	   String url = "https://maps.googleapis.com/maps/api/directions/json?"
+	   String sUrl = "https://maps.googleapis.com/maps/api/directions/json?"
                + "origin=" + startPoint 
                + "&destination=" + endPoint
                + "&waypoints=optimize:true"
                + middlePoints 
                + "&key=AIzaSyCGUhLM8pidet05dKWxJ5U9oV0v_mPq9gA";
 	   
-	   System.out.println(url);
-      
-	   
-	   waypoints.stream().forEach(w -> w.setName("Black"));
-	   return new ResponseEntity<List<Waypoint>>(waypoints, HttpStatus.OK);
+	   System.out.println("api call: "+sUrl);
+
+       try {
+    	   //Connect to Url
+    	   URL url = new URL(sUrl);
+    	   HttpURLConnection request = (HttpURLConnection) url.openConnection();
+    	   request.connect();
+    	   
+    	   //Convert Json
+    	   JsonParser jsonParser = new JsonParser();
+    	   JsonElement jsonElement = jsonParser.parse(new InputStreamReader((InputStream) request.getContent()))
+				    			   	.getAsJsonObject().getAsJsonArray("routes").get(0)
+				    			   	.getAsJsonObject().getAsJsonArray("waypoint_order");
+
+    	   //JsonObject jsonWaypoints = jsonElement.getAsJsonObject().get; 
+    	   // = jsonObject.getAsJsonArray("routes").get(0).getAsJsonArray()("w"); 
+    	  
+    	   /*JsonObject jsonWaypoints = jsonRoutes.getAsJsonObject().get("summary"); 
+    	   jsonWaypoints = jsonObject.getAsJsonObject("summary");*/
+    	   System.out.println(jsonElement);
+    	   
+    	   
+    	   request.disconnect();	
+    	  return ""; 
+       } catch (IOException ie){ 
+    	   ie.printStackTrace();
+    	   return null;
+       } 
    }
+
 }
