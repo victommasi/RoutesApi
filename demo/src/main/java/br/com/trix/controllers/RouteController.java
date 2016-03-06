@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -47,33 +48,25 @@ import br.com.trix.service.RouteRepository;
 @RequestMapping("/")
 public class RouteController
 {
-   private String startPoint;
-   private String endPoint;
-   private StringBuilder middlePoints;
-   private List<String> stop;
-   private List<String> path;
-   private HttpURLConnection connRequest;
-   //private int waypointsOrder;
-	
-   @Autowired
-   private RouteRepository repo;
+	private String startPoint;
+	private String endPoint;
+	private StringBuilder middlePoints;
+	private List<String> stop;
+	private List<String> path;
+	private HttpURLConnection connRequest;
 
-   /*@RequestMapping(value = "/route)", method = RequestMethod.GET, produces = "application/json")
-   @ResponseBody
-   public ResponseEntity <Route> getRoute(@RequestBody Route route){
-	   
-	   	return new ResponseEntity<Route>(route, HttpStatus.OK);
-   }*/
-   
-	@RequestMapping(value = "/routes)", method = RequestMethod.GET, produces = "application/json")
+	@Autowired
+	private RouteRepository repo;
+
+	@RequestMapping(value = "/routes)", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Route> getAll() {
-
-		return repo.findAll();
+	public List <Route> getAllRoutes() {
+		  return repo.findAll();
 	}
    
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public Route createRoute(@RequestBody List<Waypoint> waypoints) {
+
 		JsonElement jElement = getWaypointOrder(waypoints);
 		JsonArray jArray = jElement.getAsJsonArray();
 		stop = new ArrayList<String>();
@@ -94,6 +87,7 @@ public class RouteController
 	}
 
 	private void fillStopList(JsonArray jArray) {
+		
 		for (int i = 0; i < jArray.size(); i++) {
 			stop.add(jArray.get(i).getAsJsonObject().get("start_address").getAsString());
 		}
@@ -101,6 +95,7 @@ public class RouteController
 	}
 
 	private void fillPathList(JsonArray jArray) {
+		
 		for (int i = 0; i < jArray.size(); i++) {
 			path.add(jArray.get(i).getAsJsonObject().get("start_location").getAsJsonObject().get("lat").getAsString());
 			path.add(jArray.get(i).getAsJsonObject().get("start_location").getAsJsonObject().get("lng").getAsString());
@@ -110,6 +105,7 @@ public class RouteController
 	}
 
 	public JsonElement getWaypointOrder(List<Waypoint> waypoints) {
+		
 		System.out.println("\n\n-----------------------------");
 		// Origin point is final point as well
 		startPoint = waypoints.get(0).toString();
