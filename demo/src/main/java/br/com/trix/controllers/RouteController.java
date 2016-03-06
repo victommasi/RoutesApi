@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.apache.http.HttpException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,6 +38,7 @@ public class RouteController
    private String startPoint;
    private String endPoint;
    private StringBuilder middlePoints;
+   //private int waypointsOrder;
 	
    @Autowired
    private RouteRepository repo;
@@ -45,38 +49,7 @@ public class RouteController
       return "home/index";
    }
    
-   /*
-   * public Document getDocument(String start, String end, List<Waypoint> list) {
-        try {
-            String startPoint = URLEncoder.encode(start, "utf-8");
-            String endPoint = URLEncoder.encode(end, "utf-8");
-			
-            String url = "http://maps.googleapis.com/maps/api/directions/json?"
-                    + "origin=" + startPoint
-                    + "&destination=" + endPoint
-                    + "&waypoints=optizime:true|"
-                    + " "
-                    + "AIzaSyCGUhLM8pidet05dKWxJ5U9oV0v_mPq9gA";
-
-            HttpClient httpClient = new DefaultHttpClient();
-            HttpContext localContext = new BasicHttpContext();
-            HttpPost httpPost = new HttpPost(url);
-            HttpResponse response = httpClient.execute(httpPost, localContext);
-            InputStream in = response.getEntity().getContent();
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-                    .newDocumentBuilder();
-            Document doc = builder.parse(in);
-            return doc;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    */
-   
-   @RequestMapping(value = "/route)", method = RequestMethod.GET, produces = "application/json")
+   /*@RequestMapping(value = "/route)", method = RequestMethod.GET, produces = "application/json")
    @ResponseBody
    public ResponseEntity <Route> getRoute(@RequestBody Route route){
 	   
@@ -90,26 +63,30 @@ public class RouteController
 	   
 	   return new ResponseEntity<List<Waypoint>>(waypoints, HttpStatus.OK);
    }
-   
+   */
    
    @RequestMapping(value = "/create", method = RequestMethod.POST)
    public ResponseEntity<List<Waypoint>> createRoute(@RequestBody List<Waypoint> waypoints){
 	   
-	  String route = getRoute(waypoints);
+	   JsonElement jElement = getWaypointOrder(waypoints);
+	   JsonArray jArray = jElement.getAsJsonArray();
+	   for(int i=0; i< jArray.size(); i++){
+		   System.out.println(jArray.get(i));
+	   }
+	   
+	   //setWaypointOrder(waypoints);
 	  
 	   return new ResponseEntity<List<Waypoint>>(waypoints, HttpStatus.OK);
    }
    
-   public String getRoute(List<Waypoint> waypoints) {
-       
-	   String test;
-	   System.out.println("\n\n -----------------------------");
-	   //Ponto de origem também é o destino
+   public JsonElement getWaypointOrder(List<Waypoint> waypoints) {
+	   System.out.println("\n\n-----------------------------");
+	   //Origin point is final point as well
 	   this.startPoint = waypoints.get(0).toString();
 	   this.endPoint = startPoint;
 	   this.middlePoints = new StringBuilder();
 	  
-	   //Os pontos dos traçado da rota vao ter suas lat e lng concatenadas para criar a url da Google Api.
+	   //Waipoints will have its lat and lng concatenated to create an url got from Google Api bellow.
 	   for(int i = 1; i < waypoints.size(); i++){
 		   this.middlePoints.append("|");
 		   this.middlePoints.append(waypoints.get(i).toString());
@@ -118,38 +95,38 @@ public class RouteController
 	   String sUrl = "https://maps.googleapis.com/maps/api/directions/json?"
                + "origin=" + startPoint 
                + "&destination=" + endPoint
-               + "&waypoints=optimize:true"
-               + middlePoints 
+               + "&waypoints=optimize:true" + middlePoints 
                + "&key=AIzaSyCGUhLM8pidet05dKWxJ5U9oV0v_mPq9gA";
+	   System.out.println(sUrl);
 	   
-	   System.out.println("api call: "+sUrl);
-
-       try {
+	  
     	   //Connect to Url
-    	   URL url = new URL(sUrl);
-    	   HttpURLConnection request = (HttpURLConnection) url.openConnection();
-    	   request.connect();
-    	   
+    	   //Get the result of request and treat it
+    	   try {
+    		   URL url = new URL(sUrl);
+    		   HttpURLConnection connRequest = (HttpURLConnection) url.openConnection();
+    		   connRequest.connect();
+    		   
     	   //Convert Json
     	   JsonParser jsonParser = new JsonParser();
-    	   JsonElement jsonElement = jsonParser.parse(new InputStreamReader((InputStream) request.getContent()))
+    	   JsonElement jsonElement = jsonParser.parse(new InputStreamReader((InputStream) connRequest.getContent()))
 				    			   	.getAsJsonObject().getAsJsonArray("routes").get(0)
 				    			   	.getAsJsonObject().getAsJsonArray("waypoint_order");
+    	   
+    	   String wpString = jsonElement.toString();
+    	   System.out.println("waypoints order: " + wpString);
+    	   return jsonElement;
+    	  //return castJsonToInt(jsonElement); 
 
-    	   //JsonObject jsonWaypoints = jsonElement.getAsJsonObject().get; 
-    	   // = jsonObject.getAsJsonArray("routes").get(0).getAsJsonArray()("w"); 
-    	  
-    	   /*JsonObject jsonWaypoints = jsonRoutes.getAsJsonObject().get("summary"); 
-    	   jsonWaypoints = jsonObject.getAsJsonObject("summary");*/
-    	   System.out.println(jsonElement);
-    	   
-    	   
-    	   request.disconnect();	
-    	  return ""; 
+       }  catch (MalformedURLException he){ 
+    	   he.printStackTrace();
+    	   return null;
        } catch (IOException ie){ 
     	   ie.printStackTrace();
     	   return null;
-       } 
+       } finally {
+    	   //connRequest.connect();
+       }
    }
 
 }

@@ -33,6 +33,10 @@ public class Waypoint {
 		this.lng = lng;
 	}
 	
+	public String fillRouteJson(){
+		return this.getLat() +","+ this.getLng();
+	}
+	
 	@Override
 	public String toString(){
 		return this.getLat() +","+ this.getLng();
