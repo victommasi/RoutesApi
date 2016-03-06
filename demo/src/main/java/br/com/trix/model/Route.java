@@ -1,5 +1,6 @@
 package br.com.trix.model;
 import java.util.List;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -11,11 +12,11 @@ public class Route {
 	
 	@Id
 	private String id; 
-	private String name;
-	private Date date;
+	private String routeName;
+	private LocalDateTime routeDate;
 	private String vehicleId;
-	private List<Waypoint> stops;
-	private List<Waypoint> path;
+	private List<String> stops;
+	private List<String> path;
 
 	public String getId() {
 		return id;
@@ -26,19 +27,19 @@ public class Route {
 	}
 
 	public String getName() {
-		return name;
+		return routeName;
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.routeName = name;
 	}
     
-	public Date getDate() {
-		return date;
+	public LocalDateTime getDate() {
+		return routeDate;
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
+	public void setDate(LocalDateTime localDateTime) {
+		this.routeDate = localDateTime;
 	}
 
 	public String getVehicleId() {
@@ -49,19 +50,19 @@ public class Route {
 		this.vehicleId = vehicleId;
 	}
 
-	public List<Waypoint> getPath() {
+	public List<String> getPath() {
 		return path;
 	}
 
-	public void setPath(List<Waypoint> path) {
+	public void setPath(List<String> path) {
 		this.path = path;
 	}
 
-	public List<Waypoint> getStops() {
+	public List<String> getStops() {
 		return path;
 	}
 
-	public void setStops(List<Waypoint> stops) {
+	public void setStops(List<String> stops) {
 		this.path = stops;
 	}
 	
