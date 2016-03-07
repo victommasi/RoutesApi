@@ -3,28 +3,14 @@ package br.com.trix.controllers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
 
-import javax.swing.plaf.synth.SynthSeparatorUI;
-
-import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,12 +23,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
 import br.com.trix.model.Route;
-import br.com.trix.model.Vehicle;
 import br.com.trix.model.Waypoint;
 import br.com.trix.service.RouteRepository;
 
 //CHAVE API: AIzaSyCGUhLM8pidet05dKWxJ5U9oV0v_mPq9gA
-
 
 @RestController
 @RequestMapping("/")
@@ -76,6 +60,7 @@ public class RouteController
 		fillStopList(jArray);
 		fillPathList(jArray);
 
+		//create route and save
 		Route route = new Route();
 		route.setName(waypoints.get(0).getName());
 		route.setDate(Calendar.getInstance().getTime());
@@ -107,7 +92,7 @@ public class RouteController
 	public JsonElement getWaypointOrder(List<Waypoint> waypoints) {
 		
 		System.out.println("\n\n-----------------------------");
-		// Origin point is final point as well
+		// Origin point is also final point
 		startPoint = waypoints.get(0).toString();
 		endPoint = startPoint;
 		middlePoints = new StringBuilder();
