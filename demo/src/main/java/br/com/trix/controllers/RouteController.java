@@ -29,7 +29,7 @@ import br.com.trix.service.RouteRepository;
 //CHAVE API: AIzaSyCGUhLM8pidet05dKWxJ5U9oV0v_mPq9gA
 
 @RestController
-@RequestMapping("/")
+//@RequestMapping("/")
 public class RouteController
 {
 	private String startPoint;
@@ -41,6 +41,11 @@ public class RouteController
 
 	@Autowired
 	private RouteRepository repo;
+	
+	@RequestMapping("/test")
+    public String index() {
+        return "index";
+    }
 
 	@RequestMapping(value = "/routes)", method = RequestMethod.GET)
 	@ResponseBody
