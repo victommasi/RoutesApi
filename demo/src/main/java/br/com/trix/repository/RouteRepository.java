@@ -1,4 +1,4 @@
-package br.com.trix.service;
+package br.com.trix.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;

@@ -11,9 +11,9 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 @SpringBootApplication
 @EnableMongoRepositories
-@Configuration
-@EnableAutoConfiguration
-@ComponentScan
+//@Configuration
+//@EnableAutoConfiguration
+//@ComponentScan
 public class DemoApplication extends SpringBootServletInitializer{
 	
 	@Override

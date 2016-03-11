@@ -8,6 +8,13 @@ public class Waypoint {
 	private double lat;
 	private double lng;
 	
+	public Waypoint(){}
+	
+	public Waypoint(String name, double lat, double lng){
+		this.name = name;
+		this.lat = lat;
+		this.lng = lng;
+	}
 	
 	public String getName() {
 		return name;
