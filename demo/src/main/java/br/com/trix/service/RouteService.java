@@ -59,7 +59,7 @@ public class RouteService {
 	
 	private List<String> getListStops(DirectionsResult dirResult) {
 		List<String> stops = new ArrayList<>();
-		for (int i = 1; i < dirResult.routes[0].legs.length; i++) {
+		for (int i = 0; i < dirResult.routes[0].legs.length; i++) {
 			stops.add(dirResult.routes[0].legs[i].startAddress);
 		}
 		System.out.println(stops.toString());
