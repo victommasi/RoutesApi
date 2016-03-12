@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import com.google.maps.model.LatLng;
 
 @Document (collection="Routes")
 public class Route {
@@ -14,11 +15,11 @@ public class Route {
 	private Date date;
 	private String vehicleId;
 	private List<String> stop;
-	private List<String> path;
+	private List<LatLng> path;
 	
 	public Route(){}
 	
-	public Route(String name, Date date, String vehicleId, List<String> stop, List<String> path){
+	public Route(String name, Date date, String vehicleId, List<String> stop, List<LatLng> path){
 		this.name = name;
 		this.date = date;
 		this.vehicleId = vehicleId;
@@ -58,11 +59,11 @@ public class Route {
 		this.vehicleId = vehicleId;
 	}
 
-	public List<String> getPath() {
+	public List<LatLng> getPath() {
 		return path;
 	}
 
-	public void setPath(List<String> path) {
+	public void setPath(List<LatLng> path) {
 		this.path = path;
 	}
 
@@ -72,10 +73,5 @@ public class Route {
 
 	public void setStop(List<String> stop) {
 		this.stop = stop;
-	}
-	
-	@Override
-	public String toString(){
-		return "";
 	}
 }
