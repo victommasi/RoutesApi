@@ -27,11 +27,11 @@ public class RouteService {
 	
 	private static final Logger LOGGER = Logger.getLogger(Route.class);
 	
-	public Route getApiResult(List<Waypoint> routePoints) throws Exception{
+	public Route getApiResult(List<Waypoint> routePoints) throws Exception {
 		Route route = new Route();
 		DirectionsResult dirResult = getDirectionsResult(routePoints);
 		List<String> listStops = getListStops(dirResult);
-		List<LatLng> routePath = getRoutePath(dirResult);
+		String routePath = getRoutePath(dirResult);
 		
 		route.setName(routePoints.get(0).getName());
 		route.setDate(Calendar.getInstance().getTime());
@@ -79,10 +79,14 @@ public class RouteService {
 		return stops;
 	}
 
-	public List<LatLng> getRoutePath(DirectionsResult dirResult){
+	public String getRoutePath(DirectionsResult dirResult){
+		List<LatLng> polyLines = new ArrayList<>();
+		String stringPolylines;
+		
 		String EncodedpolyLines = dirResult.routes[0].overviewPolyline.getEncodedPath().toString();	
-		List<LatLng> polyLines = PolylineEncoding.decode(EncodedpolyLines);
-		return polyLines;
+		polyLines = PolylineEncoding.decode(EncodedpolyLines);
+		stringPolylines = polyLines.toString();
+		return stringPolylines;
 	}
 
 }

@@ -38,7 +38,6 @@ public class RouteController
 	public void createRoute(@RequestBody List<Waypoint> waypoints) {
 		Route routeApi = new Route();
 		RouteService rService = new RouteService();
-		
 		try {
 			routeApi = rService.getApiResult(waypoints);
 			repo.insert(routeApi);
