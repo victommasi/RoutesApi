@@ -31,7 +31,7 @@ public class RouteService {
 		Route route = new Route();
 		DirectionsResult dirResult = getDirectionsResult(routePoints);
 		List<String> listStops = getListStops(dirResult);
-		String routePath = getRoutePath(dirResult);
+		List<LatLng> routePath = getRoutePath(dirResult);
 		
 		route.setName(routePoints.get(0).getName());
 		route.setDate(Calendar.getInstance().getTime());
@@ -79,14 +79,11 @@ public class RouteService {
 		return stops;
 	}
 
-	public String getRoutePath(DirectionsResult dirResult){
+	public List<LatLng> getRoutePath(DirectionsResult dirResult){
 		List<LatLng> polyLines = new ArrayList<>();
-		String stringPolylines;
-		
 		String EncodedpolyLines = dirResult.routes[0].overviewPolyline.getEncodedPath().toString();	
 		polyLines = PolylineEncoding.decode(EncodedpolyLines);
-		stringPolylines = polyLines.toString();
-		return stringPolylines;
+		return polyLines;
 	}
 
 }
