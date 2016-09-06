@@ -1,7 +1,5 @@
 package br.com.trix.model;
 
-import org.springframework.data.annotation.Id;
-
 public class Waypoint {
 	
 	private String name;

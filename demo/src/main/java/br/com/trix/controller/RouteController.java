@@ -1,9 +1,11 @@
-package br.com.trix.controllers;
+package br.com.trix.controller;
 
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.RepositoryRestController;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -12,37 +14,36 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.trix.model.Route;
 import br.com.trix.model.Waypoint;
-import br.com.trix.repository.RouteRepository;
 import br.com.trix.service.RouteService;
 
+//@RepositoryRestController
 @RestController
-@RequestMapping("/")
+@RequestMapping("/route")
 public class RouteController
 {
 	@Autowired
-	private RouteRepository repo;
+	RouteService routeService;
+	
 	private static final Logger LOGGER = Logger.getLogger(Route.class); 
 	
-	@RequestMapping("/test")
+	@RequestMapping(value = "/index", method = RequestMethod.GET)
     public String index() {
         return "index";
     }
 
-	@RequestMapping(value = "/routes)", method = RequestMethod.GET)
+	@RequestMapping(value = "/list)", method = RequestMethod.GET)
 	@ResponseBody
 	public List <Route> getAllRoutes() {
-		  return repo.findAll();
+		return routeService.findAll();
 	}
    
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public void createRoute(@RequestBody List<Waypoint> waypoints) {
-		Route routeApi = new Route();
-		RouteService rService = new RouteService();
+	public void create(@RequestBody List<Waypoint> waypoints) {
+		Route route = new Route();
 		try {
-			routeApi = rService.getApiResult(waypoints);
-			repo.insert(routeApi);
+			routeService.createRoute(route, waypoints);
 		} catch (Exception e) {
-			LOGGER.error("Error creating Route: "+waypoints.get(0).getName()+" ", e);
+			LOGGER.error("Error creating Route: " + e);
 		}
 	}
 	

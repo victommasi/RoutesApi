@@ -13,16 +13,14 @@ public class Route {
 	private String id; 
 	private String name;
 	private Date date;
-	private String vehicleId;
 	private List<String> stop;
 	private List<LatLng> path;
 	
 	public Route(){}
 	
-	public Route(String name, Date date, String vehicleId, List<String> stop, List<LatLng> path){
+	public Route(String name, Date date, List<String> stop, List<LatLng> path){
 		this.name = name;
 		this.date = date;
-		this.vehicleId = vehicleId;
 		this.stop = stop;
 		this.path = path;
 	}
@@ -49,14 +47,6 @@ public class Route {
 
 	public void setDate(Date date) {
 		this.date = date;
-	}
-
-	public String getVehicleId() {
-		return vehicleId;
-	}
-
-	public void setVehicleId(String vehicleId) {
-		this.vehicleId = vehicleId;
 	}
 
 	public List<LatLng> getPath() {
