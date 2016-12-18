@@ -6,31 +6,36 @@ The best route is created by Google Maps API and saved in NoSQL database, MongoD
 * MongoDB
 
 ### Usage: 
-1. Use a rest client to communicate with application
-2. GET to /route/list retrieves the route list
-3. POST to /route/create giving json save a new route in DB 
-4. Example json:
+1. You need an Google APIKEY(It`s free) and type it inside application.properties file, like:
+```sh
+apikey=AIzaSyCGUhLM8pidet0JdnJehTlPozha_uehAq1
+```
+
+2. Use a rest client to communicate with the application
+3. GET to /route/list retrieves the route list
+4. POST to /route/create, giving json, save a new route in DB 
+5. Example json:
 ```sh
 [
 	{
-    	"name":"Fortaleza",
+    		"name":"Fortaleza",
    	 	"lat":"-3.852324",
-    	"lng":"-38.502451"
+    		"lng":"-38.502451"
 	},
 	{
-    	"name":"Salvador",
+    		"name":"Salvador",
    		"lat":"-12.937787",
-    	"lng":"-38.449182"
+    		"lng":"-38.449182"
 	},
 	{
-        "name":"Brasilia",
+        	"name":"Brasilia",
    	 	"lat":"-15.815882",
-     	"lng":"-47.838683"
+     		"lng":"-47.838683"
 	},
 	{
-    	"name":"Recife",
+    		"name":"Recife",
    		"lat":"-8.052902",
-        "lng":"-34.907085"
+        	"lng":"-34.907085"
 	}
 ]
 ```
