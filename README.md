@@ -5,7 +5,11 @@ The best route is created by Google Maps API and saved in NoSQL database, MongoD
 * Spring Boot
 * MongoDB
 
-Example json:
+
+1. Use a rest client to communicate with application
+2. GET to /route/list retrieves the route list
+3. POST to /route/create giving json save a new route in DB 
+4. Example json:
 ```sh
 [
 	{
