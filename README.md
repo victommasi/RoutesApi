@@ -6,7 +6,7 @@ The best route is created by Google Maps API and saved in NoSQL database, MongoD
 * MongoDB
 
 ### Usage: 
-1. You need an Google APIKEY(It`s free) and type it inside application.properties file, like:
+1. You need a Google APIKEY(It`s free) and type it inside application.properties file, like:
 ```sh
 apikey=AIzaSyCGUhLM8pidet0JdnJehTlPozha_uehAq1
 ```
